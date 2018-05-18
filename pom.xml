@@ -40,7 +40,7 @@
 		<name>Apache Software Foundation</name>
 		<url>http://apache.org</url>
 	</organization>
-	<inceptionYear>2006</inceptionYear>
+	<inceptionYear>2018</inceptionYear>
 	<ciManagement>
 		<system>BuildBot</system>
 		<url>http://ci.apache.org/builders/wicket-master</url>
@@ -105,7 +105,7 @@
 		<module>archetypes/quickstart</module>
 		<module>testing/wicket-common-tests</module>
 		<module>testing/wicket-js-tests</module>
-		<module>testing/wicket-arquillian</module>
+		<!--module>testing/wicket-arquillian</module--> <!-- error in java 9 -->
 		<module>wicket-native-websocket</module>
 		<module>wicket-bean-validation</module>
 		<module>wicket-cdi-1.1</module>
@@ -139,6 +139,7 @@
 		<objenesis.version>2.6</objenesis.version>
 		<aspectj.version>1.8.10</aspectj.version>
 		<metrics.version>3.2.3</metrics.version>
+    <kotlin.version>1.2.41</kotlin.version>
 	</properties>
 
 	<dependencyManagement>
@@ -602,6 +603,17 @@
 			<artifactId>slf4j-log4j12</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+        <groupId>org.jetbrains.kotlin</groupId>
+        <artifactId>kotlin-stdlib</artifactId>
+        <version>${kotlin.version}</version>
+    </dependency>
+		<dependency>
+			<groupId>org.jetbrains.kotlin</groupId>
+      <artifactId>kotlin-test</artifactId>
+			<version>${kotlin.version}</version>
+      <scope>test</scope>
+    </dependency>
 	</dependencies>
 	<build>
 		<extensions>
@@ -625,12 +637,34 @@
 			</resource>
 			<resource>
 				<filtering>false</filtering>
+				<directory>${basedir}/src/main/kotlin</directory>
+				<includes>
+					<include>**/*</include>
+				</includes>
+				<excludes>
+					<exclude>**/*.kt</exclude>
+					<exclude>**/package.html</exclude>
+				</excludes>
+			</resource>
+			<resource>
+				<filtering>false</filtering>
 				<directory>${basedir}/src/main/resources</directory>
 				<includes>
 					<include>**/*</include>
 				</includes>
 				<excludes>
 					<exclude>**/*.java</exclude>
+					<exclude>**/package.html</exclude>
+				</excludes>
+			</resource>
+			<resource>
+				<filtering>false</filtering>
+				<directory>${basedir}/src/main/resources</directory>
+				<includes>
+					<include>**/*</include>
+				</includes>
+				<excludes>
+					<exclude>**/*.kt</exclude>
 					<exclude>**/package.html</exclude>
 				</excludes>
 			</resource>
@@ -655,8 +689,50 @@
 					<exclude>**/package.html</exclude>
 				</excludes>
 			</testResource>
+			<testResource>
+				<filtering>false</filtering>
+				<directory>${basedir}/src/test/kotlin</directory>
+				<includes>
+					<include>**/*</include>
+				</includes>
+				<excludes>
+					<exclude>**/*.kt</exclude>
+					<exclude>**/package.html</exclude>
+				</excludes>
+			</testResource>
 		</testResources>
 		<plugins>
+			<plugin>
+					<artifactId>kotlin-maven-plugin</artifactId>
+					<groupId>org.jetbrains.kotlin</groupId>
+					<version>${kotlin.version}</version>
+					<executions>
+							<execution>
+									<id>compile</id>
+									<goals>
+										<goal>compile</goal>
+									</goals>
+									<configuration>
+											<sourceDirs>
+													<sourceDir>${basedir}/src/main/kotlin</sourceDir>
+													<sourceDir>${basedir}/src/main/java</sourceDir>
+											</sourceDirs>
+									</configuration>
+							</execution>
+							<execution>
+									<id>test-compile</id>
+									<goals>
+										<goal>test-compile</goal>
+									</goals>
+									<configuration>
+											<sourceDirs>
+													<sourceDir>${basedir}/src/test/kotlin</sourceDir>
+													<sourceDir>${basedir}/src/test/java</sourceDir>
+											</sourceDirs>
+									</configuration>
+							</execution>
+					</executions>
+			</plugin>
 			<plugin>
 				<artifactId>maven-remote-resources-plugin</artifactId>
 				<inherited>true</inherited>
@@ -1111,6 +1187,8 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
+    <!--sourceDirectory>${basedir}/src/main/kotlin</sourceDirectory-->
+    <!--testSourceDirectory>${basedir}/src/test/kotlin</testSourceDirectory-->
 	</build>
 	<profiles>
 		<profile>
@@ -1196,7 +1274,7 @@
 				</plugins>
 			</build>
 		</profile>
-		
+
 		<profile>
 			<id>coverage</id>
 			<build>
@@ -1205,7 +1283,7 @@
 						<groupId>org.jacoco</groupId>
 						<artifactId>jacoco-maven-plugin</artifactId>
 						<version>${jacoco.version}</version>
-						
+
 						<executions>
 							<execution>
 								<id>jacoco-initialize</id>

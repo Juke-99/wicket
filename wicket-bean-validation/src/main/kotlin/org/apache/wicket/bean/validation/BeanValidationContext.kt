@@ -15,7 +15,7 @@ import org.apache.wicket.markup.html.form.FormComponent;
  * @author igor
  *
  */
-public interface BeanValidationContext extends IPropertyResolver {
+public interface BeanValidationContext : IPropertyResolver {
 
 	/**
 	 * Gets the tag modifier for the specified annotation type
@@ -23,18 +23,17 @@ public interface BeanValidationContext extends IPropertyResolver {
 	 * @param annotationType
 	 * @return tag modifier or {@code null} if none
 	 */
-	<T extends Annotation> ITagModifier<T> getTagModifier(Class<T> annotationType);
+	fun getTagModifier : <T -> Annotation> ITagModifier<T>(annotationType : Class)
 
 	/**
 	 * @return the validator
 	 */
-	Validator getValidator();
+	fun getValidator : Validator()
 
 	/**
 	 * @return the violation translator
 	 */
-	IViolationTranslator getViolationTranslator();
+	fun getViolationTranslator : IViolationTranslator()
 
-	@Override
-	Property resolveProperty(FormComponent<?> component);
+	override fun resolveProperty : Property(component : FormComponent)
 }
